@@ -60,12 +60,15 @@ $TTL    604800
 ' >  /etc/bind/jarkom/granz.channel.E14.com
 ```
 
-Pada soal diminta untuk mengarahkan domain pada worker dengan IP akhir x.1. Sehingga riegel.canyon.E14.com diarahkan ke `192.213.4.1` dan granz.channel.E14.com diarahkan ke `192.213.3.1`.
+Pada soal diminta untuk mengarahkan domain pada worker dengan IP akhir x.1. Sehingga riegel.canyon.E14.com diarahkan ke `192.213.4.1` dan granz.channel.E14.com diarahkan ke `192.213.3.1`. Berikut hasil ping kedua DNS tersebut:
+![Screenshot 2023-11-18 144331](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/95c52204-312b-4b38-8c58-4f5483911f5b)
+![Screenshot 2023-11-18 144347](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/13e992e6-2c5b-4b29-8f94-ae6f297c3736)
 
 ## Soal 1
 > Lakukan konfigurasi sesuai dengan peta yang sudah diberikan.
 
 Berikut topologi yang digunakan:
+![Screenshot 2023-11-18 112022](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/ecbe21e5-380b-4fcb-ad98-1edfc4b49e3d)
 
 Dengan ketentuan sebaagai berikut:
 | Node      | Kategori              | Konfigurasi IP  |
@@ -277,6 +280,9 @@ subnet 192.213.3.0 netmask 255.255.255.0 {
 ' > /etc/dhcp/dhcpd.conf 
 ```
 
+Berikut IP yang diperoleh client pada subnet 3:
+![Screenshot 2023-11-18 144638](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/00cbe572-0c24-43e4-834c-362b2b85482f)
+
 ## Soal 3
 > Client yang melalui Switch4 mendapatkan range IP dari [prefix IP].4.12 - [prefix IP].4.20 dan [prefix IP].4.160 - [prefix IP].4.168.
 
@@ -301,6 +307,9 @@ subnet 192.213.4.0 netmask 255.255.255.0 {
 
 ' > /etc/dhcp/dhcpd.conf 
 ```
+
+Berikut IP yang diperoleh client pada subnet 4:
+![Screenshot 2023-11-18 144743](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/846c8e9b-e5c8-44b5-9b38-a186453279b1)
 
 ## Soal 4
 > Client mendapatkan DNS dari Heiter dan dapat terhubung dengan internet melalui DNS tersebut.
@@ -353,6 +362,9 @@ echo 'options {
 };' > /etc/bind/named.conf.options
 ```
 
+Berikut nameserver yang terdapat pada node client, serta percobaan untuk ping google.com:
+![Screenshot 2023-11-18 144851](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/037b68bf-5468-4a7b-bf01-94e0394c2cdc)
+
 ## Soal 5
 > Lama waktu DHCP server meminjamkan alamat IP kepada Client yang melalui Switch3 selama 3 menit sedangkan pada client yang melalui Switch4 selama 12 menit. Dengan waktu maksimal dialokasikan untuk peminjaman alamat IP selama 96 menit.
 
@@ -389,7 +401,9 @@ subnet 192.213.4.0 netmask 255.255.255.0 {
 ' > /etc/dhcp/dhcpd.conf 
 ```
 
-Pada subnet 3 defaultnya adalah 3 menit atau 180 detik dab pada subnet 4 defaultnya adalah 12 menit atau 720 detik. Sedangkan pada kedua subnet maxnya adalah 96 menit atau 5760 detik.
+Pada subnet 3 defaultnya adalah 3 menit atau 180 detik dab pada subnet 4 defaultnya adalah 12 menit atau 720 detik. Sedangkan pada kedua subnet maxnya adalah 96 menit atau 5760 detik. Berikut hasil lease time pada client:
+![Screenshot 2023-11-18 144638](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/00cbe572-0c24-43e4-834c-362b2b85482f)
+![Screenshot 2023-11-18 144743](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/846c8e9b-e5c8-44b5-9b38-a186453279b1)
 
 ## Soal 6
 > Pada masing-masing worker PHP, lakukan konfigurasi virtual host untuk website berikut dengan menggunakan php 7.3.
@@ -427,6 +441,13 @@ location / {
 }
 ```
 
+Berikut hasil autentikasi:
+![Screenshot 2023-11-18 145641](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/3e4d068f-7d51-45ba-bcf2-b096fb8d9255)
+![Screenshot (409)](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/79006902-4aa6-43b3-8da9-70a82761d40c)
+![Screenshot (411)](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/f46e4588-2433-4710-a7ec-74e399a0d3f2)
+![Screenshot (412)](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/6884b65d-1adb-4cac-8bf1-074e20405dbf)
+![Screenshot (413)](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/8cd70e1b-5902-4382-a025-8656d90642ab)
+
 ## Soal 11
 > Lalu buat untuk setiap request yang mengandung /its akan di proxy passing menuju halaman https://www.its.ac.id.
 
@@ -437,6 +458,10 @@ location /its {
     proxy_pass https://www.its.ac.id;
 }
 ```
+
+Berikut hasil akses /its:
+![Screenshot 2023-11-18 145744](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/e2062819-c12a-4a36-b62c-f79a65b95e01)
+![Screenshot (414)](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/85643940-3db8-4c52-af3b-6c2c5849ae85)
 
 ## Soal 12
 > Selanjutnya LB ini hanya boleh diakses oleh client dengan IP [Prefix IP].3.69, [Prefix IP].3.70, [Prefix IP].4.167, dan [Prefix IP].4.168.
@@ -455,7 +480,15 @@ location / {
 }
 ```
 
-Selain IP `192.213.3.69`, `192.213.3.70`, `192.213.4.167`,  dan `192.213.4.168` tidak diberikan akses.
+Selain IP `192.213.3.69`, `192.213.3.70`, `192.213.4.167`,  dan `192.213.4.168` tidak diberikan akses. Testing dilakukan dengan memberikan fixed address 192.213.3.69 pada `Revolte` dan 192.213.4.167 pada `Sein`, sementara itu dua client lainnya dibiarkan dinamis. Berikut hasil testing pada keempat client:
+![Screenshot 2023-11-18 150704](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/6a42f2e2-b8a6-45ae-9b39-33c8c6e520a8)
+![Screenshot (415)](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/bfb12871-7e30-4dff-a7a0-24937ba6ce7e)
+![Screenshot 2023-11-18 151133](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/e6ebbb77-ec6e-430b-aba5-d9d3cf87ed24)
+![Screenshot (417)](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/f5309fa7-5f9d-4edf-9f7a-0b4647649889)
+![Screenshot 2023-11-18 150749](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/052a9c80-2543-4a16-9c86-8d75f137484b)
+![Screenshot (416)](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/3cdaab1f-d302-4790-bec0-a1cb79c81d18)
+![Screenshot 2023-11-18 151053](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/d8d4c427-637c-45c3-bf33-422180fb9a01)
+![Screenshot (418)](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/4357753e-a542-448a-a0a5-a4106dd157ee)
 
 ## Soal 13
 > Semua data yang diperlukan, diatur pada Denken dan harus dapat diakses oleh Frieren, Flamme, dan Fern.
