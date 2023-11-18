@@ -305,6 +305,54 @@ subnet 192.213.4.0 netmask 255.255.255.0 {
 ## Soal 4
 > Client mendapatkan DNS dari Heiter dan dapat terhubung dengan internet melalui DNS tersebut.
 
+Solusinya dengan mengatur field `option domain-name-servers` pada konfigurasi subnet di node Himmel (DHCP Server) sebagai berikut:
+
+```sh
+echo '
+
+...
+
+subnet 192.213.3.0 netmask 255.255.255.0 {
+    range 192.213.3.16 192.213.3.32;
+    range 192.213.3.64 192.213.3.80;
+    option routers 192.213.3.14;
+    option broadcast-address 192.213.3.255;
+    option domain-name-servers 192.213.1.2;
+    default-lease-time 180;
+    max-lease-time 5760;
+
+}
+
+subnet 192.213.4.0 netmask 255.255.255.0 {
+    range 192.213.4.12 192.213.4.20;
+    range 192.213.4.160 192.213.4.168;
+    option routers 192.213.4.14;
+    option broadcast-address 192.213.4.255;
+    option domain-name-servers 192.213.1.2;
+    default-lease-time 720;
+    max-lease-time 5760;
+}
+
+...
+
+' > /etc/dhcp/dhcpd.conf 
+```
+
+Selain itu, pada node Heiter (DNS Server) ditambahkan `forwarder` sebagai berikut:
+
+```sh
+echo 'options {
+        directory "/var/cache/bind";
+
+        forwarders {
+                   192.168.122.1;
+          };
+        //dnssec-validation auto;
+        allow-query{ any; };
+        listen-on-v6 { any; };
+};' > /etc/bind/named.conf.options
+```
+
 ## Soal 5
 > Lama waktu DHCP server meminjamkan alamat IP kepada Client yang melalui Switch3 selama 3 menit sedangkan pada client yang melalui Switch4 selama 12 menit. Dengan waktu maksimal dialokasikan untuk peminjaman alamat IP selama 96 menit.
 
@@ -358,11 +406,56 @@ Pada subnet 3 defaultnya adalah 3 menit atau 180 detik dab pada subnet 4 default
 ## Soal 10
 > Selanjutnya coba tambahkan konfigurasi autentikasi di LB dengan dengan kombinasi username: “netics” dan password: “ajkyyy”, dengan yyy merupakan kode kelompok. Terakhir simpan file “htpasswd” nya di /etc/nginx/rahasisakita/
 
+Untuk menambahkan autentikasi pada Load Balancer dengan htpasswd, pertama-tama dilakukan instalasi `apache2-utils`. Kemudian dibuat directory sesuai keinginan soal, yaitu `/etc/nginx/rahasisakita/`. Selanjutnya tambahkan user dan password dengan command `htpasswd -bc`. Berikut scriptnya:
+
+```sh
+apt-get install apache2-utils -y
+mkdir /etc/nginx/rahasisakita/
+htpasswd -bc /etc/nginx/rahasisakita/.htpasswd netics ajkE14
+```
+
+Selain potongan kode diatas, perlu ditambahkan juga `auth_basic_user_file` pada location / yang menuju ke file htpasswd, sebagai berikut:
+
+```sh
+location / {
+    ...
+
+    auth_basic "Restricted";
+    auth_basic_user_file /etc/nginx/rahasisakita/.htpasswd;
+
+    ...
+}
+```
+
 ## Soal 11
 > Lalu buat untuk setiap request yang mengandung /its akan di proxy passing menuju halaman https://www.its.ac.id.
 
+Solusinya dengan menggunakan `proxy_pass` pada location /its, sebagai berikut:
+
+```sh
+location /its {
+    proxy_pass https://www.its.ac.id;
+}
+```
+
 ## Soal 12
 > Selanjutnya LB ini hanya boleh diakses oleh client dengan IP [Prefix IP].3.69, [Prefix IP].3.70, [Prefix IP].4.167, dan [Prefix IP].4.168.
+
+Solusinya dengan menggunakan `allow` dan `deny` pada location /, sebagai berikut:
+
+```sh
+location / {
+    ...
+
+    allow 192.213.3.69;
+    allow 192.213.3.70;
+    allow 192.213.4.167;
+    allow 192.213.4.168;
+    deny all;
+}
+```
+
+Selain IP `192.213.3.69`, `192.213.3.70`, `192.213.4.167`,  dan `192.213.4.168` tidak diberikan akses.
 
 ## Soal 13
 > Semua data yang diperlukan, diatur pada Denken dan harus dapat diakses oleh Frieren, Flamme, dan Fern.
