@@ -650,7 +650,7 @@ Selain IP `192.213.3.69`, `192.213.3.70`, `192.213.4.167`,  dan `192.213.4.168` 
 ## Soal 13
 > Semua data yang diperlukan, diatur pada Denken dan harus dapat diakses oleh Frieren, Flamme, dan Fern.
 
-Untuk mysql server kita dapat melakukan configurasi sebagai berikut
+Untuk mysql server kita dapat melakukan konfigurasi sebagai berikut:
 
 ```sh
 echo '#!/bin/bash
@@ -677,21 +677,19 @@ skip-bind-address' >> /etc/mysql/my.cnf
 service mysql restart
 ```
 
-Untuk setiap client kita hanya perlu menginstall mysql-client
+Untuk setiap client kita hanya perlu menginstall mysql-client.
 
 ```sh
 apt-get update && apt-get install mariadb-client -y
 ```
-### Dokum
 
-
+Berikut hasil ketika data diakses dari Denken (Database Server) dan Frieren (Laravel Worker):
+![13](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/fd963326-c2db-4e3f-8a21-6d14e4ba4658)
 
 ## Soal 14
 > Frieren, Flamme, dan Fern memiliki Riegel Channel sesuai dengan [quest guide](https://github.com/martuafernando/laravel-praktikum-jarkom) berikut. Jangan lupa melakukan instalasi PHP8.0 dan Composer.
 
-Untuk melakukan deployment pada nginx ada beberapa hal yang perlu disiapkan yaitu ```composer```,```nginx```,dan ```php```.
-
-Adapun full config untuk mendeploy sebagai berikut.
+Untuk melakukan deployment pada nginx ada beberapa hal yang perlu disiapkan yaitu ```composer```,```nginx```,dan ```php```. Adapun full config untuk mendeploy sebagai berikut:
 
 ```sh
 composer update
@@ -796,36 +794,74 @@ chown -R www-data.www-data /var/www/laravel-praktikum-jarkom/storage
 chmod -R 777 public
 chmod -R 777 storage
 ```
-### Dokum
 
+Berikut hasil lynx menggunakan IP ketiga Laravel worker:
+![14](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/6201868c-ba6a-4257-957f-41a7bc138059)
 
 ## Soal 15
 > Riegel Channel memiliki beberapa endpoint yang harus ditesting sebanyak 100 request dengan 10 request/second. Tambahkan response dan hasil testing pada grimoire. POST /auth/register
 
-Kita bisa testing menggunakan ```AB``` dan ```curl```
+Untuk mendapatkan response dari endpoint dapat menggunakan command sebagai berikut:
+```sh
+curl -s -X POST -H "Content-Type: application/json" -d '{"username":"username1", "password":"password1"}' http://192.213.4.1/api/auth/register
+```
 
-### Dokum
+Berikut response yang didapat:
+![Screenshot 2023-11-15 213531](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/86727281-3c7f-451b-81a7-5dd705dc7c0b)
+![Screenshot 2023-11-15 213519](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/f21692ac-a837-4c58-8cfc-8d5d386fb0a9)
 
+Untuk mendapatkan hasil testing benchmark dapat menggunakan command sebagai berikut:
+```sh
+echo '{"username":"username2", "password":"password2"}' > register.json
+ab -n 100 -c 10 -p register.json -T "application/json" -H "Content-Type:application/json" http://192.213.4.1/api/auth/register
+```
+
+Berikut hasil testing benchmark:
+![Screenshot 2023-11-16 194918](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/ad513903-498e-4daa-9928-aff8d4be994f)
 
 ## Soal 16
 > Riegel Channel memiliki beberapa endpoint yang harus ditesting sebanyak 100 request dengan 10 request/second. Tambahkan response dan hasil testing pada grimoire. POST /auth/login
 
-Kita bisa testing menggunakan ```AB``` dan ```curl```
+Untuk mendapatkan response dari endpoint dapat menggunakan command sebagai berikut:
+```sh
+curl -s -X POST -H "Content-Type: application/json" -d '{"username":"username1", "password":"password1"}' http://192.213.4.1/api/auth/login
+```
 
-### Dokum
+Berikut response yang didapat:
+![Screenshot (395)](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/61d736c6-c48c-489b-8c40-3be30d0119c7)
+
+Untuk mendapatkan hasil testing benchmark dapat menggunakan command sebagai berikut:
+```sh
+echo '{"username":"username1", "password":"password1"}' > login.json
+ab -n 100 -c 10 -p login.json -T "application/json" -H "Content-Type:application/json" http://192.213.4.1/api/auth/login
+```
+
+Berikut hasil testing benchmark:
+![Screenshot 2023-11-16 195123](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/6951e036-4236-4345-8449-385440a542e1)
 
 ## Soal 17
 > Riegel Channel memiliki beberapa endpoint yang harus ditesting sebanyak 100 request dengan 10 request/second. Tambahkan response dan hasil testing pada grimoire. GET /me
 
-Kita bisa testing menggunakan ```AB``` dan ```curl```
+Untuk mendapatkan response dari endpoint dapat menggunakan command sebagai berikut:
+```sh
+curl -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTkyLjIxMy40LjEvYXBpL2F1dGgvcmVnaXN0ZXIiLCJpYXQiOjE3MDAxMzkwMjUsImV4cCI6MTcwMDE0MjYyNSwibmJmIjoxNzAwMTM5MDI1LCJqdGkiOiJ2cGVpN3F6NVBRZkdrcWkwIiwic3ViIjoiNSIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.wGOnFRgCxbQ6xSJ25x_WQaiTSFdXjOykARHRvO9peHM" http://192.213.4.1/api/me
+```
 
-### Dokum
+Berikut response yang didapat:
+![Screenshot (396)](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/425c13fb-e5ba-4794-a7c6-bd057a8a9fe4)
+
+Untuk mendapatkan hasil testing benchmark dapat menggunakan command sebagai berikut:
+```sh
+ab -n 100 -c 10 -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTkyLjIxMy40LjEvYXBpL2F1dGgvcmVnaXN0ZXIiLCJpYXQiOjE3MDAxMzkwMjUsImV4cCI6MTcwMDE0MjYyNSwibmJmIjoxNzAwMTM5MDI1LCJqdGkiOiJ2cGVpN3F6NVBRZkdrcWkwIiwic3ViIjoiNSIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.wGOnFRgCxbQ6xSJ25x_WQaiTSFdXjOykARHRvO9peHM" http://192.213.4.1/api/me
+```
+
+Berikut hasil testing benchmark:
+![Screenshot 2023-11-16 200841](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/96915efb-d268-4899-bda5-00670f4272d1)
 
 ## Soal 18
 > Untuk memastikan ketiganya bekerja sama secara adil untuk mengatur Riegel Channel maka implementasikan Proxy Bind pada Eisen untuk mengaitkan IP dari Frieren, Flamme, dan Fern.
 
-
-Kita dapat melakukannya dengan melakukan configurasi tambahan didalam load balancer
+Kita dapat melakukannya dengan melakukan konfigurasi tambahan didalam load balancer, sebagai berikut:
 
 ```sh
 pstream backend-laravel {
@@ -870,15 +906,13 @@ server {
     access_log /var/log/nginx/lb_access.log;
 }' > /etc/nginx/sites-available/lb-jarkom
 ```
-Semua request terhadap ```ip/flamme/```,```ip/fern/```,dan ```ip/frieren/``` akan ter-redirect ke ```ip/```
-
-### Dokum
-
+Semua request terhadap ```ip/flamme/```,```ip/fern/```,dan ```ip/frieren/``` akan ter-redirect ke ```ip/```, berikut hasilnya:
+![18](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/00f71b6e-d601-4c84-aef1-20105edd34f7)
 
 ## Soal 19
 > Untuk meningkatkan performa dari Worker, coba implementasikan PHP-FPM pada Frieren, Flamme, dan Fern. Untuk testing kinerja naikkan pm.max_children, pm.start_servers, pm.min_spare_servers, pm.max_spare_servers sebanyak tiga percobaan dan lakukan testing sebanyak 100 request dengan 10 request/second kemudian berikan hasil analisisnya pada Grimoire.
 
-Kita dapat menambahkan configurasi secara manual php-fpm yang akan runing diserver kita dengan config sebagai berikut:
+Kita dapat menambahkan konfigurasi secara manual php-fpm yang akan running di server kita dengan config sebagai berikut:
 
 ```sh
 echo '
@@ -914,15 +948,42 @@ groupadd eisen_user
 useradd -g eisen_user eisen_user
 ```
 
-Jangan lupa mengubah php-fpm pada configurasi nginx menjadi ```fastcgi_pass unix:/var/run/php/php8.0-fpm-eisen-site.sock;```
+Jangan lupa mengubah php-fpm pada konfigurasi nginx menjadi ```fastcgi_pass unix:/var/run/php/php8.0-fpm-eisen-site.sock;```
 
-### Dokum
+- **Testing 1**
+```
+pm.max_children = 5
+pm.start_servers = 3
+pm.min_spare_servers = 1
+pm.max_spare_servers = 5
+```
+Berikut hasil benchmark:
+![Screenshot 2023-11-16 164322](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/9794d3c5-48c3-4a8d-9776-7cfe4155b389)
 
+- **Testing 2**
+```
+pm.max_children = 35
+pm.start_servers = 5
+pm.min_spare_servers = 3
+pm.max_spare_servers = 10
+```
+Berikut hasil benchmark:
+![Screenshot 2023-11-16 164045](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/d744a430-76c4-4d79-99a1-9094a2a896f6)
+
+- **Testing 3**
+```
+pm.max_children = 75
+pm.start_servers = 10
+pm.min_spare_servers = 5
+pm.max_spare_servers = 20
+```
+Berikut hasil benchmark:
+![Screenshot 2023-11-16 164514](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/f5a30564-bb1a-4d21-a33e-0180347dcfa3)
 
 ## Soal 20
 > Nampaknya hanya menggunakan PHP-FPM tidak cukup untuk meningkatkan performa dari worker maka implementasikan Least-Conn pada Eisen. Untuk testing kinerja dari worker tersebut dilakukan sebanyak 100 request dengan 10 request/second.
 
-Dapat mengubah configurasi di load balancer menjadi Least-Conn pada Eisen mmenjadi sebagai berikut.
+Dapat mengubah konfigurasi di load balancer menjadi Least-Conn pada Eisen mmenjadi sebagai berikut.
 
 ```sh
 upstream backend-laravel {
@@ -932,4 +993,10 @@ upstream backend-laravel {
     server 192.213.4.3;
 }
 ```
-### Dokum
+Berikut hasil benchmark:
+![Screenshot 2023-11-16 170739](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/12713608-83a5-4361-9f67-544fdc403cf6)
+
+## Kendala Pengerjaan
+Kebanyakan revisi soal mas mbak sampe rosy marah marah awkakwowokw.  
+![Screenshot 2023-09-18 213304](https://github.com/athraz/Jarkom-Modul-1-E14-2023/assets/96050618/df994f2b-f814-4243-bfa6-0a242a345774)
+
