@@ -5,6 +5,9 @@
 |Muhammad Razan Athallah    |5025211008     |athraz        |
 |Moh rosy haqqy aminy       |5025211012     |hqlco         |
 
+**Link Grimoire: [Grimoire](https://drive.google.com/file/d/1zChUzalCJndfac-gKQjm-3kgpmdJ4AWn/view?usp=sharing)**  
+**Link GNS3Project: [GNS3](https://drive.google.com/file/d/1SpXkl_FOKMBtRn8KNYYvLfIDx5LOnWje/view?usp=sharing)**
+
 ## Soal 0
 > Setelah mengalahkan Demon King, perjalanan berlanjut. Kali ini, kalian diminta untuk melakukan register domain berupa riegel.canyon.yyy.com untuk worker Laravel dan granz.channel.yyy.com untuk worker PHP, mengarah pada worker yang memiliki IP [prefix IP].x.1.
 
@@ -408,13 +411,13 @@ Pada subnet 3 defaultnya adalah 3 menit atau 180 detik dab pada subnet 4 default
 ## Soal 6
 > Pada masing-masing worker PHP, lakukan konfigurasi virtual host untuk website berikut dengan menggunakan php 7.3.
 
-Kita dapat mendeploy di nginx.
-
-Pertama clone project
+Kita dapat mendeploy di nginx. Pertama clone project sebagai berikut:
 ```
 git clone https://github.com/rosyhaqqy/granz.channel.yyy.com.git
 ```
-Lakukan deployment di nginx
+
+Lakukan deployment di nginx, sebagai berikut:
+
 ```sh
 echo 'server {
     listen 80;
@@ -440,14 +443,14 @@ echo 'server {
     access_log /var/log/nginx/jarkom_access.log;
 }' > /etc/nginx/sites-available/granz.channel.yyy.com
 ```
-setelah itu dapat diimplementasikan kesetiap worker php
 
-### Dokum
+Setelah itu dapat diimplementasikan kesetiap worker php. Berikut hasil konfigurasi pada ketiga worker php:
+![6](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/9bca19b6-cad5-4d72-bc9e-bdbb349d7e86)
 
 ## Soal 7
 > Kepala suku dari Bredt Region memberikan resource server sebagai berikut: Lawine, 4GB, 2vCPU, dan 80 GB SSD. Linie, 2GB, 2vCPU, dan 50 GB SSD. Lugner 1GB, 1vCPU, dan 25 GB SSD. aturlah agar Eisen dapat bekerja dengan maksimal, lalu lakukan testing dengan 1000 request dan 100 request/second.
 
-Melakukan config Load balancer di server eisen
+Melakukan config Load balancer di server Eisen sebagai berikut:
 
 ```sh
 echo '#LB
@@ -469,15 +472,17 @@ server {
     access_log /var/log/nginx/lb_access.log;
 }
 ```
-Weight didapat dari perkalian semua spesifikasi dari server.
 
-### Dokum
+Weight didapat dari perkalian semua spesifikasi dari server. Berikut hasil menggunakan load balancer:
+![7](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/5b1a9c34-b8f0-43c1-98cc-760bebce1a4c)
+
+Berikut hasil testing dengan 1000 request dan 100 request/second:
+![Screenshot 2023-11-19 125128](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/0442dae8-d1fc-4fd5-bf47-b236958d6188)
 
 ## Soal 8
 > Karena diminta untuk menuliskan grimoire, buatlah analisis hasil testing dengan 200 request dan 10 request/second masing-masing algoritma Load Balancer dengan ketentuan sebagai berikut: Nama Algoritma Load Balancer, Report hasil testing pada Apache Benchmark, Grafik request per second untuk masing masing algoritma, Analisis.
 
 Dalam implementasinya kelompok kami menerapkan 5 algoritma.
-
 
 ```sh
 upstream backend  {
@@ -507,12 +512,34 @@ upstream backend  {
     # server 192.213.3.3;
 }
 ```
-### Dokum
+
+- **Round Robin**  
+Merupakan algoritma load balancing default yang ada di Nginx, cara kerjanya yaitu jika kita memiliki 3 buah node, maka urutannya adalah dari node pertama, kemudian node kedua, dan ketiga. Setelah node ketiga menerima beban, maka akan diulang kembali dari node ke satu.
+Berikut hasil htop dan benchmark:
+![round-robin](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/1afc5a46-0d41-4736-aa45-e1da99f28a84)
+
+- **Weighted Round Robin**  
+Cukup dengan menetapkan weight atau beban ke masing-masing server di kumpulan server yang telah ditentukan sebelumnya. Server yang memiliki weight paling besar akan dijadikan prioritas ketika menerima request dari client. Berikut hasil htop dan benchmark:
+![weighted-round-robin](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/e35f26f7-0db8-4f74-b1b9-8526135800f0)
+
+- **Least Connection**  
+Jika Round robin akan mendistribusikan berdasarkan nomor dan urutan server, maka least-connection akan melakukan prioritas pembagian dari beban kinerja yang paling rendah. Berikut hasil htop dan benchmark:
+![least-conn](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/2bfc4b6d-2040-4f43-bf35-99a24bf8545d)
+
+- **IP Hash**  
+Algoritma ini akan melakukan hash berdasarkan request dari pengguna (menggunakan alamat IP dari pengguna). Sehingga server akan selalu menerima request dari alamat IP yang berbeda. Ketika server ini tidak tersedia, permintaan dari klien ini akan dilayani oleh server lain. Berikut hasil htop dan benchmark:
+![ip-hash](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/2320dfb4-1f89-48fd-8efb-ad013b844248)
+
+- **Generic Hash**  
+Generic hash adalah jenis load balancing yang menggunakan algoritma hash untuk mendistribusikan lalu lintas ke server backend. Algoritma hash ini menggunakan hash dari nilai tertentu untuk menentukan server backend atau worker mana yang akan menangani permintaan. Berikut hasil htop dan benchmark:
+![generic-hash](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/11fa9d32-ea38-4e38-a1be-4f3461601c10)
+
+Diperoleh request per second tertinggi adalah IP Hash, disusul dengan Generic Hash dan Least Connection. Sehingga dapat disimpulkan algoritma yang paling efisien untuk kasus praktikum ini adalah IP Hash.
 
 ## Soal 9
 > Dengan menggunakan algoritma Round Robin, lakukan testing dengan menggunakan 3 worker, 2 worker, dan 1 worker sebanyak 100 request dengan 10 request/second, kemudian tambahkan grafiknya pada grimoire.
 
-Dalam penerapanya kita hanya perlu mengurangi jumlah worker di Load Balancer
+Dalam penerapanya kita hanya perlu mengurangi jumlah worker di Load Balancer.
 
 ```sh
 upstream backend  {
@@ -532,6 +559,21 @@ upstream backend  {
     server 192.213.3.1;
 }
 ```
+
+- **3 Worker**
+Berikut hasil benchmark:
+![3worker](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/20f28025-7582-431f-b812-8e9e93b2e18d)
+
+- **2 Worker**
+Berikut hasil benchmark:
+![2worker](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/72b23dc1-5e4b-4dc5-91ca-94800d2b44e0)
+
+- **1 Worker**
+Berikut hasil benchmark:
+![1worker](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/ec234e29-12b2-484a-9ab8-f9cff9275349)
+
+Dapat disimpulkan bahwa pada algoritma Round Robin semakin banyak worker maka semakin sedikit request per secondnya. Hal ini karena request diterima oleh worker secara merata.
+
 ## Soal 10
 > Selanjutnya coba tambahkan konfigurasi autentikasi di LB dengan dengan kombinasi username: “netics” dan password: “ajkyyy”, dengan yyy merupakan kode kelompok. Terakhir simpan file “htpasswd” nya di /etc/nginx/rahasisakita/
 
