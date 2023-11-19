@@ -408,15 +408,130 @@ Pada subnet 3 defaultnya adalah 3 menit atau 180 detik dab pada subnet 4 default
 ## Soal 6
 > Pada masing-masing worker PHP, lakukan konfigurasi virtual host untuk website berikut dengan menggunakan php 7.3.
 
+Kita dapat mendeploy di nginx.
+
+Pertama clone project
+```
+git clone https://github.com/rosyhaqqy/granz.channel.yyy.com.git
+```
+Lakukan deployment di nginx
+```sh
+echo 'server {
+    listen 80;
+    root /var/www/granz.channel.yyy.com;
+    index index.php index.html index.htm;
+    server_name granz.channel.E14.com;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    # pass PHP scripts to FastCGI server
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/var/run/php/php7.3-fpm.sock;
+    }
+
+    location ~ /\.ht {
+        deny all;
+    }
+
+    error_log /var/log/nginx/jarkom_error.log;
+    access_log /var/log/nginx/jarkom_access.log;
+}' > /etc/nginx/sites-available/granz.channel.yyy.com
+```
+setelah itu dapat diimplementasikan kesetiap worker php
+
+### Dokum
+
 ## Soal 7
 > Kepala suku dari Bredt Region memberikan resource server sebagai berikut: Lawine, 4GB, 2vCPU, dan 80 GB SSD. Linie, 2GB, 2vCPU, dan 50 GB SSD. Lugner 1GB, 1vCPU, dan 25 GB SSD. aturlah agar Eisen dapat bekerja dengan maksimal, lalu lakukan testing dengan 1000 request dan 100 request/second.
+
+Melakukan config Load balancer di server eisen
+
+```sh
+echo '#LB
+upstream backend  {
+    # Default menggunakan Round Robin
+    server 192.213.3.1 weight=640;
+    server 192.213.3.2 weight=200;
+    server 192.213.3.3 weight=25;
+}
+
+server {
+    listen 80;
+    server_name _;
+
+    location / {
+        proxy_pass http://backend;
+    }
+    error_log /var/log/nginx/lb_error.log;
+    access_log /var/log/nginx/lb_access.log;
+}
+```
+Weight didapat dari perkalian semua spesifikasi dari server.
+
+### Dokum
 
 ## Soal 8
 > Karena diminta untuk menuliskan grimoire, buatlah analisis hasil testing dengan 200 request dan 10 request/second masing-masing algoritma Load Balancer dengan ketentuan sebagai berikut: Nama Algoritma Load Balancer, Report hasil testing pada Apache Benchmark, Grafik request per second untuk masing masing algoritma, Analisis.
 
+Dalam implementasinya kelompok kami menerapkan 5 algoritma.
+
+
+```sh
+upstream backend  {
+    # weight Round Robin
+    server 192.213.3.1 weight=640;
+    server 192.213.3.2 weight=200;
+    server 192.213.3.3 weight=25;
+
+    # Round Robin
+    # server 192.213.3.1;
+    # server 192.213.3.2;
+    # server 192.213.3.3;
+
+    # least_conn;
+    # server 192.213.3.1;
+    # server 192.213.3.2;
+    # server 192.213.3.3;
+
+    # ip_hash;
+    # server 192.213.3.1;
+    # server 192.213.3.2;
+    # server 192.213.3.3;
+
+    # hash $request_uri consistent;
+    # server 192.213.3.1;
+    # server 192.213.3.2;
+    # server 192.213.3.3;
+}
+```
+### Dokum
+
 ## Soal 9
 > Dengan menggunakan algoritma Round Robin, lakukan testing dengan menggunakan 3 worker, 2 worker, dan 1 worker sebanyak 100 request dengan 10 request/second, kemudian tambahkan grafiknya pada grimoire.
 
+Dalam penerapanya kita hanya perlu mengurangi jumlah worker di Load Balancer
+
+```sh
+upstream backend  {
+    # Round Robin
+    server 192.213.3.1;
+    server 192.213.3.2;
+    server 192.213.3.3;
+
+}
+upstream backend  {
+    # Round Robin
+    server 192.213.3.1;
+    server 192.213.3.2;
+}
+upstream backend  {
+    # Round Robin
+    server 192.213.3.1;
+}
+```
 ## Soal 10
 > Selanjutnya coba tambahkan konfigurasi autentikasi di LB dengan dengan kombinasi username: “netics” dan password: “ajkyyy”, dengan yyy merupakan kode kelompok. Terakhir simpan file “htpasswd” nya di /etc/nginx/rahasisakita/
 
@@ -493,23 +608,286 @@ Selain IP `192.213.3.69`, `192.213.3.70`, `192.213.4.167`,  dan `192.213.4.168` 
 ## Soal 13
 > Semua data yang diperlukan, diatur pada Denken dan harus dapat diakses oleh Frieren, Flamme, dan Fern.
 
+Untuk mysql server kita dapat melakukan configurasi sebagai berikut
+
+```sh
+echo '#!/bin/bash
+
+# MySQL connection parameters
+MYSQL_USER="root"
+MYSQL_PASSWORD=""
+# MySQL commands
+mysql -u$MYSQL_USER -p$MYSQL_PASSWORD <<EOF
+CREATE USER '\''kelompokE14'\''@'\''%'\'' IDENTIFIED BY '\''passwordE14'\''; 
+CREATE USER '\''kelompokE14'\''@'\''localhost'\'' IDENTIFIED BY '\''passwordE14'\''; 
+CREATE DATABASE dbkelompokE14; 
+GRANT ALL PRIVILEGES ON *.* TO '\''kelompokE14'\''@'\''%'\''; 
+GRANT ALL PRIVILEGES ON *.* TO '\''kelompokE14'\''@'\''localhost'\''; 
+FLUSH PRIVILEGES; 
+EOF' > /run.sh
+chmod +x /run.sh
+./run.sh
+
+echo '[mysqld]
+skip-networking=0
+skip-bind-address' >> /etc/mysql/my.cnf
+
+service mysql restart
+```
+
+Untuk setiap client kita hanya perlu menginstall mysql-client
+
+```sh
+apt-get update && apt-get install mariadb-client -y
+```
+### Dokum
+
+
+
 ## Soal 14
 > Frieren, Flamme, dan Fern memiliki Riegel Channel sesuai dengan [quest guide](https://github.com/martuafernando/laravel-praktikum-jarkom) berikut. Jangan lupa melakukan instalasi PHP8.0 dan Composer.
+
+Untuk melakukan deployment pada nginx ada beberapa hal yang perlu disiapkan yaitu ```composer```,```nginx```,dan ```php```.
+
+Adapun full config untuk mendeploy sebagai berikut.
+
+```sh
+composer update
+composer install
+
+echo 'APP_NAME=Laravel
+APP_ENV=local
+APP_KEY=
+APP_DEBUG=true
+APP_URL=http://localhost
+
+LOG_CHANNEL=stack
+LOG_DEPRECATIONS_CHANNEL=null
+LOG_LEVEL=debug
+
+DB_CONNECTION=mysql
+DB_HOST=192.213.2.1
+DB_PORT=3306
+DB_DATABASE=dbkelompokE14
+DB_USERNAME=kelompokE14
+DB_PASSWORD=passwordE14
+
+BROADCAST_DRIVER=log
+CACHE_DRIVER=file
+FILESYSTEM_DISK=local
+QUEUE_CONNECTION=sync
+SESSION_DRIVER=file
+SESSION_LIFETIME=120
+
+MEMCACHED_HOST=127.0.0.1
+
+REDIS_HOST=127.0.0.1
+REDIS_PASSWORD=null
+REDIS_PORT=6379
+
+MAIL_MAILER=smtp
+MAIL_HOST=mailpit
+MAIL_PORT=1025
+MAIL_USERNAME=null
+MAIL_PASSWORD=null
+MAIL_ENCRYPTION=null
+MAIL_FROM_ADDRESS="hello@example.com"
+MAIL_FROM_NAME="${APP_NAME}"
+
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_DEFAULT_REGION=us-east-1
+AWS_BUCKET=
+AWS_USE_PATH_STYLE_ENDPOINT=false
+
+PUSHER_APP_ID=
+PUSHER_APP_KEY=
+PUSHER_APP_SECRET=
+PUSHER_HOST=
+PUSHER_PORT=443
+PUSHER_SCHEME=https
+PUSHER_APP_CLUSTER=mt1
+
+VITE_PUSHER_APP_KEY="${PUSHER_APP_KEY}"
+VITE_PUSHER_HOST="${PUSHER_HOST}"
+VITE_PUSHER_PORT="${PUSHER_PORT}"
+VITE_PUSHER_SCHEME="${PUSHER_SCHEME}"
+VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"' > /var/www/laravel-praktikum-jarkom/.env
+
+php artisan migrate:fresh
+php artisan db:seed --class=AiringsTableSeeder
+php artisan key:generate
+php artisan jwt:secret
+
+echo 'server {
+    listen 80;
+
+    root /var/www/laravel-praktikum-jarkom/public;
+
+    index index.php index.html index.htm;
+    server_name riegel.canyon.E14.com;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    # pass PHP scripts to FastCGI server
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        # fastcgi_pass unix:/var/run/php/php8.0-fpm.sock;
+        fastcgi_pass unix:/var/run/php/php8.0-fpm-eisen-site.sock;
+    }
+
+    location ~ /\.ht {
+        deny all;
+    }
+    
+
+    error_log /var/log/nginx/implementasi_error.log;
+    access_log /var/log/nginx/implementasi_access.log;
+}' > /etc/nginx/sites-available/implementasi
+
+
+ln -s /etc/nginx/sites-available/implementasi /etc/nginx/sites-enabled/
+unlink /etc/nginx/sites-enabled/default
+chown -R www-data.www-data /var/www/laravel-praktikum-jarkom/storage
+chmod -R 777 public
+chmod -R 777 storage
+```
+### Dokum
+
 
 ## Soal 15
 > Riegel Channel memiliki beberapa endpoint yang harus ditesting sebanyak 100 request dengan 10 request/second. Tambahkan response dan hasil testing pada grimoire. POST /auth/register
 
+Kita bisa testing menggunakan ```AB``` dan ```curl```
+
+### Dokum
+
+
 ## Soal 16
 > Riegel Channel memiliki beberapa endpoint yang harus ditesting sebanyak 100 request dengan 10 request/second. Tambahkan response dan hasil testing pada grimoire. POST /auth/login
+
+Kita bisa testing menggunakan ```AB``` dan ```curl```
+
+### Dokum
 
 ## Soal 17
 > Riegel Channel memiliki beberapa endpoint yang harus ditesting sebanyak 100 request dengan 10 request/second. Tambahkan response dan hasil testing pada grimoire. GET /me
 
+Kita bisa testing menggunakan ```AB``` dan ```curl```
+
+### Dokum
+
 ## Soal 18
 > Untuk memastikan ketiganya bekerja sama secara adil untuk mengatur Riegel Channel maka implementasikan Proxy Bind pada Eisen untuk mengaitkan IP dari Frieren, Flamme, dan Fern.
+
+
+Kita dapat melakukannya dengan melakukan configurasi tambahan didalam load balancer
+
+```sh
+pstream backend-laravel {
+    # Default menggunakan Round Robin
+    server 192.213.4.1;
+    server 192.213.4.2;
+    server 192.213.4.3;
+
+    # least_conn;
+    # server 192.213.4.1;
+    # server 192.213.4.2;
+    # server 192.213.4.3;
+}
+
+server {
+    listen 8000;
+    server_name _;
+
+    location / {
+        proxy_pass http://backend-laravel;
+        proxy_set_header    X-Real-IP $remote_addr;
+        proxy_set_header    X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header    Host $http_host;
+    }
+
+    location /frieren/ {
+        proxy_bind 192.213.2.2;
+        proxy_pass http://192.213.4.1/index.php;
+    }
+
+    location /flamme/ {
+        proxy_bind 192.213.2.2;
+        proxy_pass http://192.213.4.2/index.php;
+    }
+
+    location /fern/ {
+        proxy_bind 192.213.2.2;
+        proxy_pass http://192.213.4.3/index.php;
+    }
+
+    error_log /var/log/nginx/lb_error.log;
+    access_log /var/log/nginx/lb_access.log;
+}' > /etc/nginx/sites-available/lb-jarkom
+```
+Semua request terhadap ```ip/flamme/```,```ip/fern/```,dan ```ip/frieren/``` akan ter-redirect ke ```ip/```
+
+### Dokum
+
 
 ## Soal 19
 > Untuk meningkatkan performa dari Worker, coba implementasikan PHP-FPM pada Frieren, Flamme, dan Fern. Untuk testing kinerja naikkan pm.max_children, pm.start_servers, pm.min_spare_servers, pm.max_spare_servers sebanyak tiga percobaan dan lakukan testing sebanyak 100 request dengan 10 request/second kemudian berikan hasil analisisnya pada Grimoire.
 
+Kita dapat menambahkan configurasi secara manual php-fpm yang akan runing diserver kita dengan config sebagai berikut:
+
+```sh
+echo '
+[eisen_site]
+user = eisen_user
+group = eisen_user
+listen = /var/run/php/php8.0-fpm-eisen-site.sock
+listen.owner = www-data
+listen.group = www-data
+php_admin_value[disable_functions] = exec,passthru,shell_exec,system
+php_admin_flag[allow_url_fopen] = off
+
+pm = dynamic
+; pm.max_children = 5
+; pm.start_servers = 3
+; pm.min_spare_servers = 1
+; pm.max_spare_servers = 5
+
+; pm.max_children = 35
+; pm.start_servers = 5
+; pm.min_spare_servers = 3
+; pm.max_spare_servers = 10
+
+pm.max_children = 75
+pm.start_servers = 10
+pm.min_spare_servers = 5
+pm.max_spare_servers = 20
+
+pm.process_idle_timeout = 10s
+' > /etc/php/8.0/fpm/pool.d/eisen.conf
+
+groupadd eisen_user
+useradd -g eisen_user eisen_user
+```
+
+Jangan lupa mengubah php-fpm pada configurasi nginx menjadi ```fastcgi_pass unix:/var/run/php/php8.0-fpm-eisen-site.sock;```
+
+### Dokum
+
+
 ## Soal 20
 > Nampaknya hanya menggunakan PHP-FPM tidak cukup untuk meningkatkan performa dari worker maka implementasikan Least-Conn pada Eisen. Untuk testing kinerja dari worker tersebut dilakukan sebanyak 100 request dengan 10 request/second.
+
+Dapat mengubah configurasi di load balancer menjadi Least-Conn pada Eisen mmenjadi sebagai berikut.
+
+```sh
+upstream backend-laravel {
+    least_conn;
+    server 192.213.4.1;
+    server 192.213.4.2;
+    server 192.213.4.3;
+}
+```
+### Dokum
