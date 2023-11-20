@@ -562,15 +562,15 @@ upstream backend  {
 
 - **3 Worker**
 Berikut hasil benchmark:
-![3worker](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/20f28025-7582-431f-b812-8e9e93b2e18d)
+![Screenshot 2023-11-16 173211](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/f4969c55-ef08-4892-9edd-6fb70bbc79dc)
 
 - **2 Worker**
 Berikut hasil benchmark:
-![2worker](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/72b23dc1-5e4b-4dc5-91ca-94800d2b44e0)
+![Screenshot 2023-11-16 173324](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/0c83bc7f-cce1-44c5-968e-0cecbe7d8e98)
 
 - **1 Worker**
 Berikut hasil benchmark:
-![1worker](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/ec234e29-12b2-484a-9ab8-f9cff9275349)
+![Screenshot 2023-11-16 173417](https://github.com/athraz/Jarkom-Modul-3-E14-2023/assets/96050618/b01aa262-e786-4fb6-aed0-827e36ee586c)
 
 Dapat disimpulkan bahwa pada algoritma Round Robin semakin banyak worker maka semakin sedikit request per secondnya. Hal ini karena request diterima oleh worker secara merata.
 
